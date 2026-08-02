@@ -1463,5 +1463,24 @@
 
 })();
 </script>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCD-jf6GHf5s1tUva6JsMWu9aw5xGLNpd8",
+    authDomain: "satorugojo-5981d.firebaseapp.com",
+    projectId: "satorugojo-5981d",
+    storageBucket: "satorugojo-5981d.firebasestorage.app",
+    messagingSenderId: "909427113753",
+    appId: "1:909427113753:web:876e6d1a72fb5f71b20f88",
+    measurementId: "G-L4Q14H42BB"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 </body>
 </html>
