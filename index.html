@@ -507,21 +507,7 @@
     </div>
   </section>
 
-  <!-- SCENE 3 — SCROLL SEQUENCE -->
-  <section class="scene" data-scene="scrollSeq" data-hud-state="CURSED TECHNIQUE" data-hud-domain="HOLLOW PURPLE">
-    <video id="seqAudio" src="./gojo1.mp4" preload="auto" loop style="display:none;"></video>
-    <div class="eye__stick" id="seqStick">
-      <div class="eye__bg tilt" data-tilt="0.3">
-        <img class="eye__img" id="seqImgBase" src="./video/ezgif-frame-001.png" style="object-position:50% 50%;">
-        <img class="eye__img eye__img--blend" id="seqImgBlend" src="./video/ezgif-frame-002.png" style="object-position:50% 50%;">
-        <div class="eye__overlay"></div>
-        <div class="eye__tint"></div>
-      </div>
-      <div class="seq__hint" id="seqHint" style="position:absolute;left:50%;bottom:12vh;transform:translateX(-50%);font-family:var(--mono2);font-size:12px;letter-spacing:0.4em;color:var(--cyan);text-shadow:0 0 10px rgba(79,216,255,0.8);transition:opacity 0.5s;">SCROLL TO PLAY</div>
-    </div>
-  </section>
-
-  <!-- SCENE 4 — INFINITY BARRIER (hover reveal) -->
+  <!-- SCENE 3 — INFINITY BARRIER (hover reveal) -->
   <section class="scene" data-scene="veil" data-hud-state="INFINITY: ABSOLUTE" data-hud-domain="HONORED ONE">
     <div class="veil" id="veil">
       <img class="veil__img veil__img--under" src="./img/gojo_unmasked.png" alt="Gojo unmasked — Six Eyes"
@@ -547,7 +533,7 @@
     </div>
   </section>
 
-  <!-- SCENE 5 — OUTRO -->
+  <!-- SCENE 4 — OUTRO -->
   <section class="scene scene--outro" data-scene="outro" data-hud-state="THE HONORED ONE" data-hud-domain="LIMITLESS">
     <footer class="outro">
       <div class="outro__bg" aria-hidden="true">
@@ -1169,53 +1155,6 @@
     schedule();
   })();
 
-  /* ================= SCENE 4 — SCROLL SEQUENCE (video folder) ================= */
-  var seqFrames = [];
-  for(var i=1; i<=270; i++){
-    var num = i < 10 ? '00'+i : (i < 100 ? '0'+i : i);
-    seqFrames.push('./video/ezgif-frame-' + num + '.png');
-  }
-  /* Preload in background */
-  setTimeout(function(){
-    seqFrames.forEach(function(src){ var img=new Image(); img.src=src; });
-  }, 1000);
-
-  var seqTargetFrame=0, seqFrame=0, seqLastBase=-1, seqLastBlend=-1;
-  var seqImgBase = document.getElementById('seqImgBase');
-  var seqImgBlend = document.getElementById('seqImgBlend');
-  var seqHint = document.getElementById('seqHint');
-  
-  function renderSeqFrame(value){
-    var max = seqFrames.length - 1;
-    var clamped = Math.max(0, Math.min(max, value));
-    var base = Math.floor(clamped);
-    var blend = Math.min(max, base + 1);
-    var mix = clamped - base;
-    if(base !== seqLastBase && seqImgBase){ seqImgBase.src = seqFrames[base]; seqLastBase = base; }
-    if(blend !== seqLastBlend && seqImgBlend){ seqImgBlend.src = seqFrames[blend]; seqLastBlend = blend; }
-    if(seqImgBlend) seqImgBlend.style.opacity = mix.toFixed(3);
-  }
-  
-  (function seqSequenceFrame(){
-    seqFrame += (seqTargetFrame - seqFrame) * (reduced ? 1 : 0.15);
-    if(Math.abs(seqTargetFrame - seqFrame) < 0.015) seqFrame = seqTargetFrame;
-    renderSeqFrame(seqFrame);
-    requestAnimationFrame(seqSequenceFrame);
-  })();
-
-  hooks.scrollSeq = {
-    enter: function(dir){
-      if(dir < 0) { seqTargetFrame = seqFrames.length - 1; seqFrame = seqTargetFrame; renderSeqFrame(seqTargetFrame); }
-      else { seqTargetFrame = 0; seqFrame = 0; renderSeqFrame(0); }
-      if(seqHint) seqHint.style.opacity = 1;
-      
-      var audio = document.getElementById('seqAudio');
-      if(audio){
-        audio.currentTime = 0;
-        audio.play().catch(function(e){});
-      }
-    }
-  };
 
   /* ================= SCENE CONTROLLER (Next / Prev navigation) ================= */
   var deck=document.getElementById('deck');
@@ -1246,10 +1185,6 @@
     var cur=scenes[idx], nxt=scenes[target], curName=cur.dataset.scene, nxtName=nxt.dataset.scene;
     busy=true; navNext.classList.add('busy'); navPrev.classList.add('busy');
 
-    if(curName === 'scrollSeq'){
-      var audio = document.getElementById('seqAudio');
-      if(audio) audio.pause();
-    }
 
     function proceed(){
       cur.classList.remove('is-active');
@@ -1273,46 +1208,18 @@
     if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); userInteracted=true; go(1); }
     else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); userInteracted=true; go(-1); }
   });
-  /* wheel/swipe advances one scene, OR scrubs the scroll-sequence */
+  /* wheel/swipe still advances one scene at a time (debounced) so old muscle-memory works */
   var wheelLock=0;
   addEventListener('wheel',function(e){
-    userInteracted=true; AC();
-    if(sceneName() === 'scrollSeq'){
-      if(seqHint) seqHint.style.opacity = 0;
-      var move = e.deltaY * 0.15;
-      var prevTarget = seqTargetFrame;
-      seqTargetFrame = Math.max(0, Math.min(seqFrames.length - 1, seqTargetFrame + move));
-      var atStart = (seqTargetFrame === 0 && prevTarget === 0);
-      var atEnd = (seqTargetFrame === seqFrames.length - 1 && prevTarget === seqFrames.length - 1);
-      if((atStart && e.deltaY < 0) || (atEnd && e.deltaY > 0)){
-        var now=performance.now(); if(now-wheelLock<550) return;
-        wheelLock=now; go(e.deltaY>0?1:-1);
-      }
-      return;
-    }
     var now=performance.now(); if(now-wheelLock<550) return;
     if(Math.abs(e.deltaY)<12) return; wheelLock=now;
+    userInteracted=true; AC();
     go(e.deltaY>0?1:-1);
   },{passive:true});
-
-  var touchY=null, lastTouchY=null;
-  addEventListener('touchstart',function(e){ touchY=e.touches[0].clientY; lastTouchY=touchY; },{passive:true});
-  addEventListener('touchmove',function(e){
-    if(sceneName() === 'scrollSeq' && lastTouchY !== null){
-      var dy = lastTouchY - e.touches[0].clientY;
-      lastTouchY = e.touches[0].clientY;
-      if(seqHint) seqHint.style.opacity = 0;
-      seqTargetFrame = Math.max(0, Math.min(seqFrames.length - 1, seqTargetFrame + dy * 0.8));
-    }
-  },{passive:true});
+  var touchY=null;
+  addEventListener('touchstart',function(e){ touchY=e.touches[0].clientY; },{passive:true});
   addEventListener('touchend',function(e){
-    if(touchY==null) return; var dy=touchY-(e.changedTouches[0].clientY); touchY=null; lastTouchY=null;
-    if(sceneName() === 'scrollSeq'){
-       var atStart = seqTargetFrame === 0;
-       var atEnd = seqTargetFrame === seqFrames.length - 1;
-       if((atStart && dy < -40) || (atEnd && dy > 40)){ go(dy>0?1:-1); }
-       return;
-    }
+    if(touchY==null) return; var dy=touchY-(e.changedTouches[0].clientY); touchY=null;
     if(Math.abs(dy)>60) { userInteracted=true; AC(); go(dy>0?1:-1); }
   },{passive:true});
 
