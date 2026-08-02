@@ -298,11 +298,11 @@
     radial-gradient(70% 55% at 50% 16%,rgba(91,108,255,.20),transparent 68%),
     radial-gradient(60% 45% at 50% 96%,rgba(180,107,255,.16),transparent 70%),
     radial-gradient(ellipse at center,#0a0f22 0%,var(--ink) 72%);}
-  .outro__bg img{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);min-width:100%;min-height:100%;
-    width:auto;height:120%;object-fit:cover;object-position:50% 22%;opacity:.16;
-    filter:grayscale(.15) brightness(.72) saturate(1.15);
-    -webkit-mask-image:radial-gradient(ellipse 60% 60% at 50% 42%,#000 20%,transparent 78%);
-            mask-image:radial-gradient(ellipse 60% 60% at 50% 42%,#000 20%,transparent 78%);}
+  .outro__bg img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:100%;min-height:100%;
+    width:100%;height:100%;object-fit:cover;object-position:50% 50%;opacity:0.6;
+    filter: brightness(0.8) saturate(1.2);
+    -webkit-mask-image:radial-gradient(ellipse 100% 100% at 50% 50%,#000 40%,transparent 90%);
+            mask-image:radial-gradient(ellipse 100% 100% at 50% 50%,#000 40%,transparent 90%);}
   .outro__bg::after{content:'六眼';position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:1;
     font-family:var(--kanji);font-weight:800;font-size:clamp(220px,42vw,600px);line-height:1;white-space:nowrap;
     color:transparent;-webkit-text-stroke:1px rgba(79,216,255,.05);}
@@ -338,7 +338,7 @@
   .deck{position:fixed;inset:0;z-index:1;}
   .scene{position:absolute;inset:0;width:100%;height:100vh;overflow:hidden;background:#000;
     opacity:0;pointer-events:none;z-index:1;
-    transition:opacity .85s cubic-bezier(.4,0,.2,1),transform .85s cubic-bezier(.4,0,.2,1);
+    transition:opacity .6s cubic-bezier(.4,0,.2,1),transform .6s cubic-bezier(.4,0,.2,1);
     transform:scale(1.015);will-change:opacity,transform;}
   .scene.is-active{opacity:1;pointer-events:auto;z-index:2;transform:none;}
 
@@ -451,7 +451,7 @@
   <section class="scene" data-scene="eye" data-hud-state="SIX EYES: OPENING" data-hud-domain="SEALED">
     <div class="eye__stick" id="eyeStick">
       <div class="eye__bg tilt" data-tilt="0.3">
-        <video class="eye__video" id="eyeVid" muted playsinline preload="auto"
+        <video class="eye__video" id="eyeVid" playsinline preload="auto"
                poster="./eyes_opening_frames/frame_001.png" src="./eyes%20opening.mp4"></video>
         <div class="eye__overlay"></div>
         <div class="eye__tint"></div>
@@ -475,7 +475,7 @@
       <div class="drop__stage" id="dropStage">
         <div class="drop__world" id="dropWorld">
           <div class="drop__sky"></div>
-          <video class="drop__video" id="sealVid" muted playsinline preload="auto"
+          <video class="drop__video" id="sealVid" playsinline preload="auto"
                  poster="./hand-sign_frames/frame_001.png" src="./hand-sign.mp4"></video>
           <div class="drop__intro" id="dropIntro">
             <span class="ik">領域展開</span>
@@ -507,7 +507,21 @@
     </div>
   </section>
 
-  <!-- SCENE 3 — INFINITY BARRIER (hover reveal) -->
+  <!-- SCENE 3 — SCROLL SEQUENCE -->
+  <section class="scene" data-scene="scrollSeq" data-hud-state="CURSED TECHNIQUE" data-hud-domain="HOLLOW PURPLE">
+    <video id="seqAudio" src="./gojo1.mp4" preload="auto" loop style="display:none;"></video>
+    <div class="eye__stick" id="seqStick">
+      <div class="eye__bg tilt" data-tilt="0.3">
+        <img class="eye__img" id="seqImgBase" src="./video/ezgif-frame-001.png" style="object-position:50% 50%;">
+        <img class="eye__img eye__img--blend" id="seqImgBlend" src="./video/ezgif-frame-002.png" style="object-position:50% 50%;">
+        <div class="eye__overlay"></div>
+        <div class="eye__tint"></div>
+      </div>
+      <div class="seq__hint" id="seqHint" style="position:absolute;left:50%;bottom:12vh;transform:translateX(-50%);font-family:var(--mono2);font-size:12px;letter-spacing:0.4em;color:var(--cyan);text-shadow:0 0 10px rgba(79,216,255,0.8);transition:opacity 0.5s;">SCROLL TO PLAY</div>
+    </div>
+  </section>
+
+  <!-- SCENE 4 — INFINITY BARRIER (hover reveal) -->
   <section class="scene" data-scene="veil" data-hud-state="INFINITY: ABSOLUTE" data-hud-domain="HONORED ONE">
     <div class="veil" id="veil">
       <img class="veil__img veil__img--under" src="./img/gojo_unmasked.png" alt="Gojo unmasked — Six Eyes"
@@ -533,11 +547,11 @@
     </div>
   </section>
 
-  <!-- SCENE 4 — OUTRO -->
+  <!-- SCENE 5 — OUTRO -->
   <section class="scene scene--outro" data-scene="outro" data-hud-state="THE HONORED ONE" data-hud-domain="LIMITLESS">
     <footer class="outro">
       <div class="outro__bg" aria-hidden="true">
-        <img src="./img/gojo_portrait.png" alt="" onerror="this.remove();">
+        <img src="./img/gojjo.png.jpeg" alt="" onerror="this.remove();">
         <div class="outro__glow"></div>
       </div>
       <span class="k">無下限</span>
@@ -1155,6 +1169,54 @@
     schedule();
   })();
 
+  /* ================= SCENE 4 — SCROLL SEQUENCE (video folder) ================= */
+  var seqFrames = [];
+  for(var i=1; i<=270; i++){
+    var num = i < 10 ? '00'+i : (i < 100 ? '0'+i : i);
+    seqFrames.push('./video/ezgif-frame-' + num + '.png');
+  }
+  /* Preload in background */
+  setTimeout(function(){
+    seqFrames.forEach(function(src){ var img=new Image(); img.src=src; });
+  }, 1000);
+
+  var seqTargetFrame=0, seqFrame=0, seqLastBase=-1, seqLastBlend=-1;
+  var seqImgBase = document.getElementById('seqImgBase');
+  var seqImgBlend = document.getElementById('seqImgBlend');
+  var seqHint = document.getElementById('seqHint');
+  
+  function renderSeqFrame(value){
+    var max = seqFrames.length - 1;
+    var clamped = Math.max(0, Math.min(max, value));
+    var base = Math.floor(clamped);
+    var blend = Math.min(max, base + 1);
+    var mix = clamped - base;
+    if(base !== seqLastBase && seqImgBase){ seqImgBase.src = seqFrames[base]; seqLastBase = base; }
+    if(blend !== seqLastBlend && seqImgBlend){ seqImgBlend.src = seqFrames[blend]; seqLastBlend = blend; }
+    if(seqImgBlend) seqImgBlend.style.opacity = mix.toFixed(3);
+  }
+  
+  (function seqSequenceFrame(){
+    seqFrame += (seqTargetFrame - seqFrame) * (reduced ? 1 : 0.15);
+    if(Math.abs(seqTargetFrame - seqFrame) < 0.015) seqFrame = seqTargetFrame;
+    renderSeqFrame(seqFrame);
+    requestAnimationFrame(seqSequenceFrame);
+  })();
+
+  hooks.scrollSeq = {
+    enter: function(dir){
+      if(dir < 0) { seqTargetFrame = seqFrames.length - 1; seqFrame = seqTargetFrame; renderSeqFrame(seqTargetFrame); }
+      else { seqTargetFrame = 0; seqFrame = 0; renderSeqFrame(0); }
+      if(seqHint) seqHint.style.opacity = 1;
+      
+      var audio = document.getElementById('seqAudio');
+      if(audio){
+        audio.currentTime = 0;
+        audio.play().catch(function(e){});
+      }
+    }
+  };
+
   /* ================= SCENE CONTROLLER (Next / Prev navigation) ================= */
   var deck=document.getElementById('deck');
   var scenes=[].slice.call(deck.querySelectorAll('.scene'));
@@ -1184,13 +1246,18 @@
     var cur=scenes[idx], nxt=scenes[target], curName=cur.dataset.scene, nxtName=nxt.dataset.scene;
     busy=true; navNext.classList.add('busy'); navPrev.classList.add('busy');
 
+    if(curName === 'scrollSeq'){
+      var audio = document.getElementById('seqAudio');
+      if(audio) audio.pause();
+    }
+
     function proceed(){
       cur.classList.remove('is-active');
       nxt.classList.add('is-active');
       idx=target; syncUI();
       var h=hooks[nxtName];
       if(h && h.enter) h.enter(dir);
-      setTimeout(function(){ busy=false; navNext.classList.remove('busy'); navPrev.classList.remove('busy'); },900);
+      setTimeout(function(){ busy=false; navNext.classList.remove('busy'); navPrev.classList.remove('busy'); },600);
     }
     /* going back FROM a scene that owns a reverse animation → play it first */
     var ch=hooks[curName];
@@ -1206,18 +1273,47 @@
     if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); userInteracted=true; go(1); }
     else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); userInteracted=true; go(-1); }
   });
-  /* wheel/swipe still advances one scene at a time (debounced) so old muscle-memory works */
+  /* wheel/swipe advances one scene, OR scrubs the scroll-sequence */
   var wheelLock=0;
   addEventListener('wheel',function(e){
-    var now=performance.now(); if(now-wheelLock<650) return;
+    userInteracted=true; AC();
+    if(sceneName() === 'scrollSeq'){
+      if(seqHint) seqHint.style.opacity = 0;
+      var move = e.deltaY * 0.15;
+      var prevTarget = seqTargetFrame;
+      seqTargetFrame = Math.max(0, Math.min(seqFrames.length - 1, seqTargetFrame + move));
+      var atStart = (seqTargetFrame === 0 && prevTarget === 0);
+      var atEnd = (seqTargetFrame === seqFrames.length - 1 && prevTarget === seqFrames.length - 1);
+      if((atStart && e.deltaY < 0) || (atEnd && e.deltaY > 0)){
+        var now=performance.now(); if(now-wheelLock<550) return;
+        wheelLock=now; go(e.deltaY>0?1:-1);
+      }
+      return;
+    }
+    var now=performance.now(); if(now-wheelLock<550) return;
     if(Math.abs(e.deltaY)<12) return; wheelLock=now;
     go(e.deltaY>0?1:-1);
   },{passive:true});
-  var touchY=null;
-  addEventListener('touchstart',function(e){ touchY=e.touches[0].clientY; },{passive:true});
+
+  var touchY=null, lastTouchY=null;
+  addEventListener('touchstart',function(e){ touchY=e.touches[0].clientY; lastTouchY=touchY; },{passive:true});
+  addEventListener('touchmove',function(e){
+    if(sceneName() === 'scrollSeq' && lastTouchY !== null){
+      var dy = lastTouchY - e.touches[0].clientY;
+      lastTouchY = e.touches[0].clientY;
+      if(seqHint) seqHint.style.opacity = 0;
+      seqTargetFrame = Math.max(0, Math.min(seqFrames.length - 1, seqTargetFrame + dy * 0.8));
+    }
+  },{passive:true});
   addEventListener('touchend',function(e){
-    if(touchY==null) return; var dy=touchY-(e.changedTouches[0].clientY); touchY=null;
-    if(Math.abs(dy)>60) go(dy>0?1:-1);
+    if(touchY==null) return; var dy=touchY-(e.changedTouches[0].clientY); touchY=null; lastTouchY=null;
+    if(sceneName() === 'scrollSeq'){
+       var atStart = seqTargetFrame === 0;
+       var atEnd = seqTargetFrame === seqFrames.length - 1;
+       if((atStart && dy < -40) || (atEnd && dy > 40)){ go(dy>0?1:-1); }
+       return;
+    }
+    if(Math.abs(dy)>60) { userInteracted=true; AC(); go(dy>0?1:-1); }
   },{passive:true});
 
   syncUI();
